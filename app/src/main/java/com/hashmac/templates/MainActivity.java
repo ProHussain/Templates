@@ -18,9 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -106,5 +104,146 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    private void postDataRetro() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(" https://service.iiilab.com/video/")
+                // as we are sending data in json format so
+                // we have to add Gson converter factory
+                .addConverterFactory(GsonConverterFactory.create())
+                // at last we are building our retrofit builder.
+                .build();
+        // below line is to create an instance for our retrofit api class.
+        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+
+        Long timestamp = System.currentTimeMillis();
+        String sign = MD5(link + timestamp + clientSecretKey);
+        // passing data from our text fields to our modal class.
+        DataModel modal = new DataModel(link,String.valueOf(timestamp),sign,client);
+
+        // calling a method to create a post and passing our modal class.
+        Call<ReturnModel> call = retrofitAPI.createPost(modal);
+
+        // on below line we are executing our method.
+        call.enqueue(new Callback<ReturnModel>() {
+            @Override
+            public void onResponse(Call<ReturnModel> call, Response<ReturnModel> response) {
+                // this method is called when we get response from our api.
+                Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+
+                ReturnModel responseFromAPI = response.body();
+                Log.e("Res",responseFromAPI.data[0].getCover());
+
+            }
+
+            @Override
+            public void onFailure(Call<ReturnModel> call, Throwable t) {
+                // setting text to our text view when
+                // we get error response from API.
+                Log.e("Errpr",t.getMessage());
+            }
+        });
+    }
+
+    public interface RetrofitAPI {
+
+        @POST("download")
+        Call<ReturnModel> createPost(@Body DataModel dataModal);
+    }
+
+    public class DataModel {
+        String link;
+        String timestamp;
+        String sign;
+        String client;
+
+        public DataModel(String link, String timestamp, String sign, String client) {
+            this.link = link;
+            this.timestamp = timestamp;
+            this.sign = sign;
+            this.client = client;
+        }
+    }
+
+    public class ReturnModel {
+        String retCode;
+        String retDesc;
+        Data[] data;
+        boolean succ;
+
+        public ReturnModel(String retCode, String retDesc, Data[] data, boolean succ) {
+            this.retCode = retCode;
+            this.retDesc = retDesc;
+            this.data = data;
+            this.succ = succ;
+        }
+
+        public String getRetCode() {
+            return retCode;
+        }
+
+        public void setRetCode(String retCode) {
+            this.retCode = retCode;
+        }
+
+        public String getRetDesc() {
+            return retDesc;
+        }
+
+        public void setRetDesc(String retDesc) {
+            this.retDesc = retDesc;
+        }
+
+        public Data[] getData() {
+            return data;
+        }
+
+        public void setData(Data[] data) {
+            this.data = data;
+        }
+
+        public boolean isSucc() {
+            return succ;
+        }
+
+        public void setSucc(boolean succ) {
+            this.succ = succ;
+        }
+    }
+
+    public class Data {
+        String cover;
+        String text;
+        String video;
+
+        public Data(String cover, String text, String video) {
+            this.cover = cover;
+            this.text = text;
+            this.video = video;
+        }
+
+        public String getCover() {
+            return cover;
+        }
+
+        public void setCover(String cover) {
+            this.cover = cover;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public String getVideo() {
+            return video;
+        }
+
+        public void setVideo(String video) {
+            this.video = video;
+        }
+    }
 
 }
