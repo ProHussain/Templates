@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Templates</string>
+    <string name="Button">Background</string>
+    <string name="title_activity_maps_image">MapsImageActivity</string>
+</resources>
