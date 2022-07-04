@@ -8,18 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,49 +33,9 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             //   postDataVolley();
                 postDataRetro();
             }
         });
-    }
-
-
-
-    private void postDataVolley() {
-        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-        StringRequest request = new StringRequest(Request.Method.POST, "https://service.iiilab.com/video/download", new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-
-                Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
-                try {
-                    JSONObject respObj = new JSONObject(response);
-                    Log.e("Respo",response);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // method to handle errors.
-                Toast.makeText(MainActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Long timestamp = System.currentTimeMillis();
-                String sign = MD5(link + timestamp + clientSecretKey);
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("link", link);
-                params.put("timestamp", String.valueOf(timestamp));
-                params.put("sign", sign);
-                params.put("client", client);
-                return params;
-            }
-        };
-        queue.add(request);
     }
 
     public String MD5(String md5) {
